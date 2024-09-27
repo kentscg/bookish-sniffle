@@ -1,0 +1,353 @@
+openapi: 3.0.3
+info:
+  title: Department Management API
+  description: API for managing departments within an organization.
+  version: 1.0.0
+paths:
+  /v1/departments:
+    post:
+      summary: Create a new department
+      description: Creates a new department with basic details.
+      operationId: createDepartment
+      tags:
+        - Departments
+      requestBody:
+        description: Department creation details
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - code
+              properties:
+                name:
+                  type: string
+                  description: Name of the department
+                  example: "Human Resources"
+                code:
+                  type: string
+                  description: Unique code for the department
+                  example: "HR"
+                description:
+                  type: string
+                  description: Additional description of the department
+                  example: "Handles all HR-related activities and employee management."
+      responses:
+        "201":
+          description: Department created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  departmentId:
+                    type: string
+                    description: Unique identifier for the created department
+                    example: "123e4567-e89b-12d3-a456-426614174000"
+                  message:
+                    type: string
+                    description: Success message
+                    example: "Department created successfully."
+        "400":
+          description: Invalid request parameters
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errorCode:
+                    type: string
+                    description: Error code indicating the issue
+                    example: "INVALID_INPUT"
+                  message:
+                    type: string
+                    description: Error message
+                    example: "Invalid department code."
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errorCode:
+                    type: string
+                    description: Error code indicating the issue
+                    example: "SERVER_ERROR"
+                  message:
+                    type: string
+                    description: Error message
+                    example: "An unexpected error occurred. Please try again later."
+    get:
+      summary: List all departments
+      description: Retrieves a list of all departments.
+      operationId: listDepartments
+      tags:
+        - Departments
+      parameters:
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 10
+          description: Number of departments to retrieve
+        - in: query
+          name: offset
+          schema:
+            type: integer
+            default: 0
+          description: Offset for pagination
+      responses:
+        "200":
+          description: A list of departments
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    departmentId:
+                      type: string
+                      description: Unique identifier for the department
+                      example: "123e4567-e89b-12d3-a456-426614174000"
+                    name:
+                      type: string
+                      description: Name of the department
+                      example: "Human Resources"
+                    code:
+                      type: string
+                      description: Code of the department
+                      example: "HR"
+                    description:
+                      type: string
+                      description: Additional description of the department
+                      example: "Handles all HR-related activities and employee management."
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errorCode:
+                    type: string
+                    description: Error code indicating the issue
+                    example: "SERVER_ERROR"
+                  message:
+                    type: string
+                    description: Error message
+                    example: "An unexpected error occurred. Please try again later."
+  /v1/departments/{departmentId}:
+    get:
+      summary: Retrieve a single department
+      description: Retrieves details of a single department by its ID.
+      operationId: getDepartment
+      tags:
+        - Departments
+      parameters:
+        - in: path
+          name: departmentId
+          required: true
+          schema:
+            type: string
+          description: Unique identifier for the department
+          example: "123e4567-e89b-12d3-a456-426614174000"
+      responses:
+        "200":
+          description: Department details retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  departmentId:
+                    type: string
+                    description: Unique identifier for the department
+                    example: "123e4567-e89b-12d3-a456-426614174000"
+                  name:
+                    type: string
+                    description: Name of the department
+                    example: "Human Resources"
+                  code:
+                    type: string
+                    description: Code of the department
+                    example: "HR"
+                  description:
+                    type: string
+                    description: Additional description of the department
+                    example: "Handles all HR-related activities and employee management."
+        "404":
+          description: Department not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errorCode:
+                    type: string
+                    description: Error code indicating the issue
+                    example: "NOT_FOUND"
+                  message:
+                    type: string
+                    description: Error message
+                    example: "Department not found."
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errorCode:
+                    type: string
+                    description: Error code indicating the issue
+                    example: "SERVER_ERROR"
+                  message:
+                    type: string
+                    description: Error message
+                    example: "An unexpected error occurred. Please try again later."
+    put:
+      summary: Update a department
+      description: Updates details of an existing department.
+      operationId: updateDepartment
+      tags:
+        - Departments
+      parameters:
+        - in: path
+          name: departmentId
+          required: true
+          schema:
+            type: string
+          description: Unique identifier for the department
+          example: "123e4567-e89b-12d3-a456-426614174000"
+      requestBody:
+        description: Updated department details
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: Name of the department
+                  example: "Human Resources"
+                code:
+                  type: string
+                  description: Unique code for the department
+                  example: "HR"
+                description:
+                  type: string
+                  description: Additional description of the department
+                  example: "Handles all HR-related activities and employee management."
+      responses:
+        "200":
+          description: Department updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  departmentId:
+                    type: string
+                    description: Unique identifier for the updated department
+                    example: "123e4567-e89b-12d3-a456-426614174000"
+                  message:
+                    type: string
+                    description: Success message
+                    example: "Department updated successfully."
+        "400":
+          description: Invalid request parameters
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errorCode:
+                    type: string
+                    description: Error code indicating the issue
+                    example: "INVALID_INPUT"
+                  message:
+                    type: string
+                    description: Error message
+                    example: "Invalid department code."
+        "404":
+          description: Department not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errorCode:
+                    type: string
+                    description: Error code indicating the issue
+                    example: "NOT_FOUND"
+                  message:
+                    type: string
+                    description: Error message
+                    example: "Department not found."
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errorCode:
+                    type: string
+                    description: Error code indicating the issue
+                    example: "SERVER_ERROR"
+                  message:
+                    type: string
+                    description: Error message
+                    example: "An unexpected error occurred. Please try again later."
+    delete:
+      summary: Delete a department
+      description: Deletes an existing department by its ID.
+      operationId: deleteDepartment
+      tags:
+        - Departments
+      parameters:
+        - in: path
+          name: departmentId
+          required: true
+          schema:
+            type: string
+          description: Unique identifier for the department
+          example: "123e4567-e89b-12d3-a456-426614174000"
+      responses:
+        "204":
+          description: Department deleted successfully
+        "404":
+          description: Department not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errorCode:
+                    type: string
+                    description: Error code indicating the issue
+                    example: "NOT_FOUND"
+                  message:
+                    type: string
+                    description: Error message
+                    example: "Department not found."
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errorCode:
+                    type: string
+                    description: Error code indicating the issue
+                    example: "SERVER_ERROR"
+                  message:
+                    type: string
+                    description: Error message
+                    example: "An unexpected error occurred. Please try again later."

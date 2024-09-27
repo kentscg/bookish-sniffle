@@ -1,9 +1,5 @@
 # OpenAPI Definition Starter
 
-## How to use this starter
-
-![Click use template button](https://user-images.githubusercontent.com/3975738/92927304-12e35d80-f446-11ea-9bd3-a0f8a69792d0.png)
-
 ## Working on your OpenAPI Definition
 
 ### Install
@@ -14,12 +10,15 @@
 ### Usage
 
 #### `npm start`
+
 Starts the reference docs preview server.
 
 #### `npm run build`
+
 Bundles the definition to the dist folder.
 
 #### `npm test`
+
 Validates the definition.
 
 ## Contribution Guide
@@ -36,10 +35,9 @@ adjust the file/folder organization.
 
 The `.redocly.yaml` controls settings for various
 tools including the lint tool and the reference
-docs engine.  Open it to find examples and
+docs engine. Open it to find examples and
 [read the docs](https://redocly.com/docs/cli/configuration/)
 for more information.
-
 
 ### Schemas
 
@@ -51,14 +49,18 @@ for more information.
 4. Refer to the schema using the `$ref` (see example below).
 
 ##### Example Schema
+
 This is a very simple schema example:
+
 ```yaml
 type: string
 description: The resource ID. Defaults to UUID v4
 maxLength: 50
 example: 4f6cf35x-2c4y-483z-a0a9-158621f77a21
 ```
+
 This is a more complex schema example:
+
 ```yaml
 type: object
 properties:
@@ -126,7 +128,6 @@ properties:
     items:
       anyOf:
         - $ref: ./Embeds/LeadSourceEmbed.yaml
-
 ```
 
 If you have an JSON example, you can convert it to JSON schema using Redocly's [JSON to JSON schema tool](https://redocly.com/tools/json-to-json-schema/).
@@ -163,9 +164,10 @@ You will use `$ref`s to reference schema from your path definitions.
 3. Add the path and a ref to it inside of your `openapi.yaml` file inside of the `openapi` folder.
 
 Example addition to the `openapi.yaml` file:
+
 ```yaml
-'/customers/{id}':
-  $ref: './paths/customers_{id}.yaml'
+"/customers/{id}":
+  $ref: "./paths/customers_{id}.yaml"
 ```
 
 Here is an example of a YAML file named `customers_{id}.yaml` in the `paths` folder:
@@ -186,7 +188,7 @@ get:
     - $ref: ../components/parameters/collectionExpand.yaml
     - $ref: ../components/parameters/collectionFields.yaml
   responses:
-    '200':
+    "200":
       description: A list of Customers was retrieved successfully
       headers:
         Rate-Limit-Limit:
@@ -212,7 +214,7 @@ get:
             type: array
             items:
               $ref: ../components/schemas/Customer.yaml
-    '401':
+    "401":
       $ref: ../components/responses/AccessForbidden.yaml
   x-code-samples:
     - lang: PHP
@@ -227,13 +229,13 @@ post:
   requestBody:
     $ref: ../components/requestBodies/Customer.yaml
   responses:
-    '201':
+    "201":
       $ref: ../components/responses/Customer.yaml
-    '401':
+    "401":
       $ref: ../components/responses/AccessForbidden.yaml
-    '409':
+    "409":
       $ref: ../components/responses/Conflict.yaml
-    '422':
+    "422":
       $ref: ../components/responses/InvalidDataError.yaml
   x-code-samples:
     - lang: PHP

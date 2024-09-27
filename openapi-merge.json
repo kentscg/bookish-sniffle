@@ -1,0 +1,20 @@
+{
+    "inputs": [
+        {
+            "inputFile": "./openapi/paths/header.yaml"
+        },
+        {
+            "inputFile": "./openapi/paths/auth.yaml"
+        },
+        {
+            "inputFile": "./openapi/paths/account_v1.yaml"
+        },
+        {
+            "inputFile": "./openapi/paths/account_v2.yaml"
+        },
+        {
+            "inputFile": "./openapi/paths/department.yaml"
+        }
+    ],
+    "output": "./openapi/openapi.yaml"
+}

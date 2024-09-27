@@ -1,15 +1,15 @@
-openapi: 3.1.0
+openapi: 3.0.3
 info:
   version: 1.0.0
   title: Example API
-  termsOfService: https://example.com/terms/
+  termsOfService: 'https://example.com/terms/'
   contact:
     name: Contact our support
     email: contact@example.com
-    url: http://example.com/contact
+    url: 'http://example.com/contact'
   license:
     name: Apache 2.0
-    url: http://www.apache.org/licenses/LICENSE-2.0.html
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
   x-logo:
     url: 'https://redocly.github.io/openapi-template/logo.png'
     altText: OpenAPI example logo
@@ -25,98 +25,894 @@ info:
 
     It also demonstrates features of the
     [create-openapi-repo](https://github.com/Redocly/create-openapi-repo) tool
-    and the [Redoc](https://github.com/Redocly/Redoc) documentation engine. Beyond
-    the standard OpenAPI syntax, we use a few 
-    [vendor extensions](https://github.com/Redocly/Redoc/blob/main/docs/redoc-vendor-extensions.md).
+    and the [Redoc](https://github.com/Redocly/Redoc) documentation engine.
+    Beyond the standard OpenAPI syntax, we use a few  [vendor
+    extensions](https://github.com/Redocly/Redoc/blob/main/docs/redoc-vendor-extensions.md).
 
     # OpenAPI Specification
 
-    The goal of The OpenAPI Specification is to define a standard, language-agnostic interface to REST APIs which
-    allows both humans and computers to discover and understand the capabilities
-    of the service without access to source
-    code, documentation, or through network traffic inspection. When properly
-    defined via OpenAPI, a consumer can 
-    understand and interact with the remote service with a minimal amount of
-    implementation logic. Similar to what
-    interfaces have done for lower-level programming, OpenAPI removes the
-    guesswork in calling the service.
-externalDocs:
-  description: "Find out how to create a GitHub repo for your OpenAPI definition."
-  url: 'https://github.com/Redocly/create-openapi-repo'
-tags:
-  - name: Echo
-    description: "Example echo operations."
-  - name: User
-    description: "Example actions on user accounts."
-  - name: Admin
-    description: "Example operations reserved for administrators."
-  - name: Info
-    description: "Example operations for retrieving information."
-  - name: Tag
-    description: "This is a tag description."
-x-tagGroups:
-  - name: General
-    tags:
-      - User
-      - Info
-      - Echo
-  - name: Administration
-    tags:
-      - Admin
+    The goal of The OpenAPI Specification is to define a standard,
+    language-agnostic interface to REST APIs which allows both humans and
+    computers to discover and understand the capabilities of the service without
+    access to source code, documentation, or through network traffic inspection.
+    When properly defined via OpenAPI, a consumer can  understand and interact
+    with the remote service with a minimal amount of implementation logic.
+    Similar to what interfaces have done for lower-level programming, OpenAPI
+    removes the guesswork in calling the service.
 servers:
-  - url: https://{tenant}/api/v1
-    variables:
-      tenant:
-        default: www
-        description: Your tenant id
-  - url: https://example.com/api/v1
+  - url: 'http://localhost:8080/'
+externalDocs:
+  description: Find out how to create a GitHub repo for your OpenAPI definition.
+  url: 'https://github.com/Redocly/create-openapi-repo'
+security:
+  - BearerAuth: []
+tags:
+  - name: Authentication
+    description: API for user login authentication.
+  - name: Accounts
+    description: API for managing user accounts.
+  - name: Departments
+    description: API for managing departments within an organization.
 paths:
-  '/users/{username}':
-    $ref: 'paths/users_{username}.yaml'
-  '/user':
-    $ref: 'paths/user.yaml'
-  '/user/list':
-    $ref: 'paths/user-status.yaml'
-  /pathItem:
-    $ref: paths/pathItem.yaml
-  /pathItemWithExamples:
-    $ref: paths/pathItemWithExamples.yaml
-  '/echo':
-    $ref: 'paths/echo.yaml'
-components:
-  securitySchemes:
-    main_auth:
-      description: "Example description text of the OAuth2 scheme."
-      type: oauth2
-      flows:
-        implicit:
-          authorizationUrl: http://example.com/api/oauth/dialog
-          scopes:
-            'read:users': read user info
-            'write:users': modify or remove users
-    api_key:
-      description: "Example description text of the API key scheme."
-      type: apiKey
-      in: header
-      name: api_key
-    basic_auth:
-      type: http
-      scheme: basic
-webhooks:
-  userInfo:
+  /v1/auth/login:
     post:
-      summary: New user webhook
-      description: "Information about a new user in the system."
-      operationId: userInfo
+      summary: User login
+      description: Authenticates a user and returns an access token.
+      operationId: loginUser
       tags:
-        - Info
+        - Authentication
       requestBody:
+        description: User login credentials
+        required: true
         content:
           application/json:
             schema:
-              $ref: 'components/schemas/User.yaml'
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                  format: email
+                  description: User's email address
+                  example: user@example.com
+                password:
+                  type: string
+                  format: password
+                  description: User's password
+                  example: P@ssw0rd!
       responses:
         '200':
-          description: "Successfully retrieved information about a new user."
-      security:
-        - api_key: []
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  accessToken:
+                    type: string
+                    description: JWT access token
+                    example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+                  refreshToken:
+                    type: string
+                    description: Refresh token for generating new access tokens
+                    example: dGhpc1JvbmRvbVJlZnJlc2hUb2tlbi4uLg==
+                  expiresIn:
+                    type: integer
+                    description: Access token expiration time in seconds
+                    example: 3600
+                  tokenType:
+                    type: string
+                    description: Type of token returned
+                    example: Bearer
+        '400':
+          description: Invalid login credentials
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errorCode:
+                    type: string
+                    description: Error code indicating the issue
+                    example: INVALID_CREDENTIALS
+                  message:
+                    type: string
+                    description: Error message
+                    example: Invalid email or password.
+        '401':
+          description: Unauthorized access
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errorCode:
+                    type: string
+                    description: Error code indicating the issue
+                    example: UNAUTHORIZED
+                  message:
+                    type: string
+                    description: Error message
+                    example: Unauthorized access.
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errorCode:
+                    type: string
+                    description: Error code indicating the issue
+                    example: SERVER_ERROR
+                  message:
+                    type: string
+                    description: Error message
+                    example: An unexpected error occurred. Please try again later.
+  /v1/accounts:
+    post:
+      summary: Create a new account
+      description: Creates a new user account with basic details.
+      operationId: createAccount
+      tags:
+        - Accounts
+      requestBody:
+        description: Account creation details
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - fullName
+                - email
+                - password
+              properties:
+                fullName:
+                  type: string
+                  description: Full name of the user (first and last name combined)
+                  example: John Doe
+                email:
+                  type: string
+                  format: email
+                  description: User's email address
+                  example: john.doe@example.com
+                password:
+                  type: string
+                  format: password
+                  description: User's account password
+                  example: mySecurePassword123
+                phoneNumber:
+                  type: string
+                  description: User's phone number in E.164 format
+                  example: '+1234567890'
+                dateOfBirth:
+                  type: string
+                  format: date
+                  description: User's date of birth
+                  example: '1990-01-01'
+      responses:
+        '201':
+          description: Account created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  accountId:
+                    type: string
+                    description: Unique identifier for the created account
+                    example: 123e4567-e89b-12d3-a456-426614174000
+                  message:
+                    type: string
+                    description: Success message
+                    example: Account created successfully.
+        '400':
+          description: Invalid request parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    get:
+      deprecated: true
+      summary: List all accounts
+      description: Retrieves a list of all user accounts with pagination support.
+      operationId: listAccounts
+      tags:
+        - Accounts
+      parameters:
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 10
+          description: Number of accounts to retrieve
+        - in: query
+          name: offset
+          schema:
+            type: integer
+            default: 0
+          description: Offset for pagination
+      responses:
+        '200':
+          description: A list of user accounts with pagination details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Pagination'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  '/v1/accounts/{accountId}':
+    get:
+      summary: Retrieve a single account
+      description: Retrieves details of a single user account by its ID.
+      operationId: getAccount
+      tags:
+        - Accounts
+      parameters:
+        - in: path
+          name: accountId
+          required: true
+          schema:
+            type: string
+          description: Unique identifier for the account
+          example: 123e4567-e89b-12d3-a456-426614174000
+      responses:
+        '200':
+          description: Account details retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Account'
+        '404':
+          description: Account not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    put:
+      summary: Update an account
+      description: Updates details of an existing user account.
+      operationId: updateAccount
+      tags:
+        - Accounts
+      parameters:
+        - in: path
+          name: accountId
+          required: true
+          schema:
+            type: string
+          description: Unique identifier for the account
+          example: 123e4567-e89b-12d3-a456-426614174000
+      requestBody:
+        description: Updated account details
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                fullName:
+                  type: string
+                  description: Full name of the user (first and last name combined)
+                  example: John Doe
+                email:
+                  type: string
+                  format: email
+                  description: User's email address
+                  example: john.doe@example.com
+                phoneNumber:
+                  type: string
+                  description: User's phone number in E.164 format
+                  example: '+1234567890'
+                dateOfBirth:
+                  type: string
+                  format: date
+                  description: User's date of birth
+                  example: '1990-01-01'
+      responses:
+        '200':
+          description: Account updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  accountId:
+                    type: string
+                    description: Unique identifier for the updated account
+                    example: 123e4567-e89b-12d3-a456-426614174000
+                  message:
+                    type: string
+                    description: Success message
+                    example: Account updated successfully.
+        '400':
+          description: Invalid request parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Account not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      summary: Delete an account
+      description: Deletes an existing user account by its ID.
+      operationId: deleteAccount
+      tags:
+        - Accounts
+      parameters:
+        - in: path
+          name: accountId
+          required: true
+          schema:
+            type: string
+          description: Unique identifier for the account
+          example: 123e4567-e89b-12d3-a456-426614174000
+      responses:
+        '204':
+          description: Account deleted successfully
+        '404':
+          description: Account not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /v2/accounts:
+    get:
+      summary: List all accounts
+      description: Retrieves a list of all user accounts with pagination support.
+      operationId: listAccounts1
+      tags:
+        - Accounts
+      parameters:
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 10
+          description: Number of accounts to retrieve
+        - in: query
+          name: offset
+          schema:
+            type: integer
+            default: 0
+          description: Offset for pagination
+      responses:
+        '200':
+          description: A list of user accounts with pagination details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginationV2'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - code
+                  - message
+                properties:
+                  code:
+                    type: string
+                    description: Error code indicating the issue
+                    example: INVALID_INPUT
+                  message:
+                    type: string
+                    description: Detailed error message
+                    example: Invalid email format.
+  /v1/departments:
+    post:
+      summary: Create a new department
+      description: Creates a new department with basic details.
+      operationId: createDepartment
+      tags:
+        - Departments
+      requestBody:
+        description: Department creation details
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - code
+              properties:
+                name:
+                  type: string
+                  description: Name of the department
+                  example: Human Resources
+                code:
+                  type: string
+                  description: Unique code for the department
+                  example: HR
+                description:
+                  type: string
+                  description: Additional description of the department
+                  example: Handles all HR-related activities and employee management.
+      responses:
+        '201':
+          description: Department created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  departmentId:
+                    type: string
+                    description: Unique identifier for the created department
+                    example: 123e4567-e89b-12d3-a456-426614174000
+                  message:
+                    type: string
+                    description: Success message
+                    example: Department created successfully.
+        '400':
+          description: Invalid request parameters
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errorCode:
+                    type: string
+                    description: Error code indicating the issue
+                    example: INVALID_INPUT
+                  message:
+                    type: string
+                    description: Error message
+                    example: Invalid department code.
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errorCode:
+                    type: string
+                    description: Error code indicating the issue
+                    example: SERVER_ERROR
+                  message:
+                    type: string
+                    description: Error message
+                    example: An unexpected error occurred. Please try again later.
+    get:
+      summary: List all departments
+      description: Retrieves a list of all departments.
+      operationId: listDepartments
+      tags:
+        - Departments
+      parameters:
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 10
+          description: Number of departments to retrieve
+        - in: query
+          name: offset
+          schema:
+            type: integer
+            default: 0
+          description: Offset for pagination
+      responses:
+        '200':
+          description: A list of departments
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    departmentId:
+                      type: string
+                      description: Unique identifier for the department
+                      example: 123e4567-e89b-12d3-a456-426614174000
+                    name:
+                      type: string
+                      description: Name of the department
+                      example: Human Resources
+                    code:
+                      type: string
+                      description: Code of the department
+                      example: HR
+                    description:
+                      type: string
+                      description: Additional description of the department
+                      example: >-
+                        Handles all HR-related activities and employee
+                        management.
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errorCode:
+                    type: string
+                    description: Error code indicating the issue
+                    example: SERVER_ERROR
+                  message:
+                    type: string
+                    description: Error message
+                    example: An unexpected error occurred. Please try again later.
+  '/v1/departments/{departmentId}':
+    get:
+      summary: Retrieve a single department
+      description: Retrieves details of a single department by its ID.
+      operationId: getDepartment
+      tags:
+        - Departments
+      parameters:
+        - in: path
+          name: departmentId
+          required: true
+          schema:
+            type: string
+          description: Unique identifier for the department
+          example: 123e4567-e89b-12d3-a456-426614174000
+      responses:
+        '200':
+          description: Department details retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  departmentId:
+                    type: string
+                    description: Unique identifier for the department
+                    example: 123e4567-e89b-12d3-a456-426614174000
+                  name:
+                    type: string
+                    description: Name of the department
+                    example: Human Resources
+                  code:
+                    type: string
+                    description: Code of the department
+                    example: HR
+                  description:
+                    type: string
+                    description: Additional description of the department
+                    example: Handles all HR-related activities and employee management.
+        '404':
+          description: Department not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errorCode:
+                    type: string
+                    description: Error code indicating the issue
+                    example: NOT_FOUND
+                  message:
+                    type: string
+                    description: Error message
+                    example: Department not found.
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errorCode:
+                    type: string
+                    description: Error code indicating the issue
+                    example: SERVER_ERROR
+                  message:
+                    type: string
+                    description: Error message
+                    example: An unexpected error occurred. Please try again later.
+    put:
+      summary: Update a department
+      description: Updates details of an existing department.
+      operationId: updateDepartment
+      tags:
+        - Departments
+      parameters:
+        - in: path
+          name: departmentId
+          required: true
+          schema:
+            type: string
+          description: Unique identifier for the department
+          example: 123e4567-e89b-12d3-a456-426614174000
+      requestBody:
+        description: Updated department details
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: Name of the department
+                  example: Human Resources
+                code:
+                  type: string
+                  description: Unique code for the department
+                  example: HR
+                description:
+                  type: string
+                  description: Additional description of the department
+                  example: Handles all HR-related activities and employee management.
+      responses:
+        '200':
+          description: Department updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  departmentId:
+                    type: string
+                    description: Unique identifier for the updated department
+                    example: 123e4567-e89b-12d3-a456-426614174000
+                  message:
+                    type: string
+                    description: Success message
+                    example: Department updated successfully.
+        '400':
+          description: Invalid request parameters
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errorCode:
+                    type: string
+                    description: Error code indicating the issue
+                    example: INVALID_INPUT
+                  message:
+                    type: string
+                    description: Error message
+                    example: Invalid department code.
+        '404':
+          description: Department not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errorCode:
+                    type: string
+                    description: Error code indicating the issue
+                    example: NOT_FOUND
+                  message:
+                    type: string
+                    description: Error message
+                    example: Department not found.
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errorCode:
+                    type: string
+                    description: Error code indicating the issue
+                    example: SERVER_ERROR
+                  message:
+                    type: string
+                    description: Error message
+                    example: An unexpected error occurred. Please try again later.
+    delete:
+      summary: Delete a department
+      description: Deletes an existing department by its ID.
+      operationId: deleteDepartment
+      tags:
+        - Departments
+      parameters:
+        - in: path
+          name: departmentId
+          required: true
+          schema:
+            type: string
+          description: Unique identifier for the department
+          example: 123e4567-e89b-12d3-a456-426614174000
+      responses:
+        '204':
+          description: Department deleted successfully
+        '404':
+          description: Department not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errorCode:
+                    type: string
+                    description: Error code indicating the issue
+                    example: NOT_FOUND
+                  message:
+                    type: string
+                    description: Error message
+                    example: Department not found.
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errorCode:
+                    type: string
+                    description: Error code indicating the issue
+                    example: SERVER_ERROR
+                  message:
+                    type: string
+                    description: Error message
+                    example: An unexpected error occurred. Please try again later.
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    Account:
+      type: object
+      properties:
+        accountId:
+          type: string
+          description: Unique identifier for the account
+          example: 123e4567-e89b-12d3-a456-426614174000
+        fullName:
+          type: string
+          description: Full name of the user
+          example: John Doe
+        email:
+          type: string
+          format: email
+          description: User's email address
+          example: john.doe@example.com
+        dateOfBirth:
+          type: string
+          format: date
+          description: User's date of birth
+          example: '1990-01-01'
+        phoneNumber:
+          type: string
+          description: User's phone number in E.164 format
+          example: '+1234567890'
+    Pagination:
+      type: object
+      properties:
+        totalItems:
+          type: integer
+          description: Total number of items available
+          example: 100
+        totalPages:
+          type: integer
+          description: Total number of pages available
+          example: 10
+        currentPage:
+          type: integer
+          description: The current page number
+          example: 1
+        itemsPerPage:
+          type: integer
+          description: Number of items per page
+          example: 10
+        items:
+          type: array
+          description: List of items for the current page
+          items:
+            $ref: '#/components/schemas/Account'
+    Error:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: string
+          description: Error code indicating the issue
+          example: INVALID_INPUT
+        message:
+          type: string
+          description: Detailed error message
+          example: Invalid email format.
+    AccountV2:
+      type: object
+      properties:
+        accountId:
+          type: string
+          description: Unique identifier for the account
+          example: 123e4567-e89b-12d3-a456-426614174000
+        fullName:
+          type: string
+          description: Full name of the user
+          example: John Doe
+        email:
+          type: string
+          format: email
+          description: User's email address
+          example: john.doe@example.com
+        dateOfBirth:
+          type: string
+          format: date
+          description: User's date of birth
+          example: '1990-01-01'
+        phoneNumber:
+          type: string
+          description: User's phone number in E.164 format
+          example: '+1234567890'
+        race:
+          type: string
+          description: User's race
+          example: Malay
+    PaginationV2:
+      type: object
+      properties:
+        totalItems:
+          type: integer
+          description: Total number of items available
+          example: 100
+        totalPages:
+          type: integer
+          description: Total number of pages available
+          example: 10
+        currentPage:
+          type: integer
+          description: The current page number
+          example: 1
+        itemsPerPage:
+          type: integer
+          description: Number of items per page
+          example: 10
+        items:
+          type: array
+          description: List of items for the current page
+          items:
+            $ref: '#/components/schemas/AccountV2'
+x-tagGroups:
+  - name: General
+    tags:
+      - Authentication
+  - name: Administration
+    tags:
+      - Accounts
+      - Departments
